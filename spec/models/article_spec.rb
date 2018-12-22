@@ -9,6 +9,7 @@ RSpec.describe Article, type: :model do
 
     it 'should validate the presence of the title' do
       article = FactoryBot.build :article, title: ''
+      #article = build :article, title: '' (b/c factorybot config added)
       expect(article).not_to be_valid
       expect(article.errors.messages[:title]).to include("can't be blank")
     end
