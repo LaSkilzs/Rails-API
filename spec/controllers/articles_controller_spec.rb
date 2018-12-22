@@ -11,23 +11,47 @@ describe ArticlesController do
     end
 
     #Make sure test have a body so (render json:{} wont work alone)
+    # it 'should return proper json' do
+    #   create_list :article, 2
+    #   subject
+    #   json = JSON.parse(response.body)
+    #   # pp json
+    #   json_data = json['data']
+    #   expect(json_data.length).to eq(2)
+    #   expect(json_data[0]['attributes']).to eq({
+    #     "title" => "My awesome article 1",
+    #     "content" => "The content of my awesome article 1",
+    #     "slug" => "my-awesome-article-1"
+    #     })
+    #     expect(json_data[1]['attributes']).to eq({
+    #     "title" => "My awesome article 2",
+    #     "content" => "The content of my awesome article 2",
+    #     "slug" => "my-awesome-article-2"
+    #     })
+    # end
+
+    #REFACTORED 
+    # #### Alterative Way to Shorten Code  -- includes support folder ### 
     it 'should return proper json' do
-      articles = create_list :article, 2
+      create_list :article, 2
       subject
-      json = JSON.parse(response.body)
-      # pp json
-      json_data = json['data']
-      expect(json_data.length).to eq(2)
-      expect(json_data[0]['attributes']).to eq({
-        "title" => "My awesome article 1",
-        "content" => "The content of my awesome article 1",
-        "slug" => "my-awesome-article-1"
+      Article.recent.each_with_index do |article, index|
+        expect(json_data[index]['attributes']).to eq({
+          'title' => article.title,
+          'content' => article.content,
+          'slug' => article.slug
         })
-        expect(json_data[1]['attributes']).to eq({
-        "title" => "My awesome article 2",
-        "content" => "The content of my awesome article 2",
-        "slug" => "my-awesome-article-2"
-        })
+      end
+    end
+
+
+    it 'should return articles in the proper order' do
+      #make sure newer articles are presented at the top
+      old_article = create :article
+      newer_article = create :article
+      subject
+      expect(json_data.first['id']).to eq(newer_article.id.to_s)
+      expect(json_data.last['id']).to eq(old_article.id.to_s)
     end
   end
 end
